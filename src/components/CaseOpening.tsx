@@ -163,7 +163,7 @@ export default function CaseOpening({ caseData, onComplete, onClose }: CaseOpeni
 
         {!isSpinning && wonItem && (
           <div className="text-center space-y-6 animate-fade-in">
-            <div className="flex justify-center mb-4 animate-pulse-glow">
+            <div className={`flex justify-center mb-4 animate-pulse-glow ${wonItem.rarity === 'legendary' || wonItem.rarity === 'epic' ? 'shimmer sparkle' : ''}`}>
               <NFTImage name={wonItem.name} size={150} className="drop-shadow-2xl" />
             </div>
             <h3 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">

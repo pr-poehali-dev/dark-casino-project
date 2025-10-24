@@ -52,7 +52,7 @@ export default function Inventory({ items, onSell }: InventoryProps) {
               </Badge>
               
               <div className="text-center py-4">
-                <div className="flex justify-center mb-3">
+                <div className={`flex justify-center mb-3 ${item.rarity === 'legendary' || item.rarity === 'epic' ? 'shimmer sparkle' : ''}`}>
                   <NFTImage name={item.name} size={80} />
                 </div>
                 <p className="font-semibold text-sm mb-2">{item.name}</p>
