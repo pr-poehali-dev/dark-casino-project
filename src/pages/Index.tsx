@@ -80,7 +80,7 @@ export default function Index() {
           <div className="flex items-center gap-3">
             <div className="text-4xl">🎰</div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              TELEGRAM CASINO
+              telorezov casino
             </h1>
           </div>
           
