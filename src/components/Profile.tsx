@@ -32,7 +32,7 @@ export default function Profile({ user, sessionToken, onUpdate, onClose }: Profi
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'X-Auth-Token': sessionToken,
+          'X-Session-Token': sessionToken,
         },
         body: JSON.stringify({
           user_id: user.user_id,
@@ -76,21 +76,45 @@ export default function Profile({ user, sessionToken, onUpdate, onClose }: Profi
         <div className="space-y-6">
           <div className="space-y-3">
             <label className="text-sm font-medium">Аватар</label>
-            <div className="grid grid-cols-8 gap-2">
-              {avatarOptions.map((avatar) => (
-                <button
-                  key={avatar}
-                  type="button"
-                  onClick={() => setSelectedAvatar(avatar)}
-                  className={`text-3xl p-3 rounded-lg transition-all hover:scale-110 ${
-                    selectedAvatar === avatar
-                      ? 'bg-primary/20 ring-2 ring-primary scale-110'
-                      : 'bg-muted/30 hover:bg-muted/50'
-                  }`}
-                >
-                  {avatar}
-                </button>
-              ))}
+            <div className="flex flex-col gap-3">
+              <div className="grid grid-cols-8 gap-2">
+                {avatarOptions.map((avatar) => (
+                  <button
+                    key={avatar}
+                    type="button"
+                    onClick={() => setSelectedAvatar(avatar)}
+                    className={`text-3xl p-3 rounded-lg transition-all hover:scale-110 ${
+                      selectedAvatar === avatar
+                        ? 'bg-primary/20 ring-2 ring-primary scale-110'
+                        : 'bg-muted/30 hover:bg-muted/50'
+                    }`}
+                  >
+                    {avatar}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        setSelectedAvatar(event.target?.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="bg-muted/50"
+                />
+                {selectedAvatar && !avatarOptions.includes(selectedAvatar) && (
+                  <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-primary flex-shrink-0">
+                    <img src={selectedAvatar} alt="Avatar" className="w-full h-full object-cover" />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

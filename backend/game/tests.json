@@ -1,0 +1,46 @@
+{
+  "tests": [
+    {
+      "name": "Get user balance and inventory",
+      "method": "GET",
+      "headers": {
+        "X-Session-Token": "test-session-token-123"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "balance": "number",
+        "inventory": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Open case with sufficient balance",
+      "method": "POST",
+      "headers": {
+        "X-Session-Token": "test-session-token-123"
+      },
+      "body": {
+        "action": "open_case",
+        "price": 100,
+        "item_name": "Test Item",
+        "item_rarity": "common",
+        "item_image": "test.png",
+        "item_price": 50
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "balance": "number"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Unauthorized request without token",
+      "method": "GET",
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "Unauthorized"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

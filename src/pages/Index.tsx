@@ -87,8 +87,33 @@ export default function Index() {
     if (savedUser && savedToken) {
       setUser(JSON.parse(savedUser));
       setSessionToken(savedToken);
+      loadGameData(savedToken);
     }
   }, []);
+
+  const loadGameData = async (token: string) => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/c4061606-ddf6-4798-8855-449f46a4bd0d', {
+        method: 'GET',
+        headers: {
+          'X-Session-Token': token,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setBalance(data.balance);
+        setInventory(data.inventory.map((item: any) => ({
+          id: item.id.toString(),
+          name: item.name,
+          rarity: item.rarity,
+          emoji: '🎁',
+          price: item.price,
+        })));
+      }
+    } catch (error) {
+      console.error('Failed to load game data:', error);
+    }
+  };
 
   const handleAuth = (userData: any, token: string) => {
     setUser(userData);
@@ -116,20 +141,59 @@ export default function Index() {
 
   const handleOpenCase = (caseData: typeof CASES[0]) => {
     if (balance >= caseData.price) {
-      setBalance(balance - caseData.price);
       setOpeningCase(caseData);
     }
   };
 
-  const handleCaseOpened = (wonItem: {name: string, rarity: string, emoji: string, price: number}) => {
-    const itemWithId = { ...wonItem, id: Date.now().toString() + Math.random() };
-    setInventory([...inventory, itemWithId]);
+  const handleCaseOpened = async (wonItem: {name: string, rarity: string, emoji: string, price: number, img?: string}) => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/c4061606-ddf6-4798-8855-449f46a4bd0d', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Session-Token': sessionToken,
+        },
+        body: JSON.stringify({
+          action: 'open_case',
+          price: openingCase?.price || 0,
+          item_name: wonItem.name,
+          item_rarity: wonItem.rarity,
+          item_image: wonItem.img || '',
+          item_price: wonItem.price,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setBalance(data.balance);
+        await loadGameData(sessionToken);
+      }
+    } catch (error) {
+      console.error('Failed to open case:', error);
+    }
     setOpeningCase(null);
   };
 
-  const handleSellItem = (itemId: string, price: number) => {
-    setInventory(inventory.filter(item => item.id !== itemId));
-    setBalance(balance + price);
+  const handleSellItem = async (itemId: string, price: number) => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/c4061606-ddf6-4798-8855-449f46a4bd0d', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Session-Token': sessionToken,
+        },
+        body: JSON.stringify({
+          action: 'sell_item',
+          item_id: parseInt(itemId),
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setBalance(data.balance);
+        setInventory(inventory.filter(item => item.id !== itemId));
+      }
+    } catch (error) {
+      console.error('Failed to sell item:', error);
+    }
   };
 
   return (
@@ -219,9 +283,29 @@ export default function Index() {
                       key={amount}
                       variant="outline"
                       className="h-16 text-lg font-semibold hover:border-primary hover:text-primary"
-                      onClick={() => setBalance(balance + amount)}
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('https://functions.poehali.dev/c4061606-ddf6-4798-8855-449f46a4bd0d', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                              'X-Session-Token': sessionToken,
+                            },
+                            body: JSON.stringify({
+                              action: 'deposit',
+                              amount: amount,
+                            }),
+                          });
+                          const data = await response.json();
+                          if (response.ok) {
+                            setBalance(data.balance);
+                          }
+                        } catch (error) {
+                          console.error('Failed to deposit:', error);
+                        }
+                      }}
                     >
-                      {amount} ₽
+                      {amount} ⭐
                     </Button>
                   ))}
                 </div>
@@ -241,8 +325,8 @@ export default function Index() {
               <div className="space-y-4">
                 <div className="text-center text-muted-foreground">
                   <Icon name="Ban" size={48} className="mx-auto mb-4 text-destructive" />
-                  <p className="text-lg">Минимальная сумма вывода: 1000 ₽</p>
-                  <p className="text-sm mt-2">Ваш баланс: {balance} ₽</p>
+                  <p className="text-lg">Минимальная сумма вывода: 1000 ⭐</p>
+                  <p className="text-sm mt-2">Ваш баланс: {balance} ⭐</p>
                 </div>
                 <Button 
                   className="w-full h-12 text-lg font-semibold" 
@@ -279,7 +363,7 @@ export default function Index() {
                 </div>
                 <div className="flex justify-between items-center p-4 bg-muted rounded-lg">
                   <span className="text-muted-foreground">Баланс</span>
-                  <span className="font-bold text-primary">{balance} ₽</span>
+                  <span className="font-bold text-primary">{balance} ⭐</span>
                 </div>
               </div>
             </Card>

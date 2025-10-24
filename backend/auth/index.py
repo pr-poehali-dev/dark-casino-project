@@ -35,7 +35,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, X-Auth-Token',
+                'Access-Control-Allow-Headers': 'Content-Type, X-Session-Token',
                 'Access-Control-Max-Age': '86400'
             },
             'body': '',
@@ -65,8 +65,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 session_token = generate_session_token()
                 
                 cursor.execute(
-                    "INSERT INTO users (user_id, email, password_hash, nickname, balance) VALUES (%s, %s, %s, %s, %s)",
-                    (user_id, email, password_hash, nickname, 1000)
+                    "INSERT INTO users (user_id, email, password_hash, nickname, balance, session_token) VALUES (%s, %s, %s, %s, %s, %s)",
+                    (user_id, email, password_hash, nickname, 1000, session_token)
                 )
                 conn.commit()
                 
@@ -117,6 +117,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 session_token = generate_session_token()
                 
+                cursor = conn.cursor()
+                cursor.execute(
+                    "UPDATE users SET session_token = %s WHERE email = %s",
+                    (session_token, email)
+                )
+                conn.commit()
+                cursor.close()
+                
                 return {
                     'statusCode': 200,
                     'headers': {
@@ -132,7 +140,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
         
         elif method == 'PUT':
-            auth_token = event.get('headers', {}).get('X-Auth-Token') or event.get('headers', {}).get('x-auth-token')
+            auth_token = event.get('headers', {}).get('X-Session-Token') or event.get('headers', {}).get('x-session-token')
             
             if not auth_token:
                 return {
@@ -165,15 +173,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             if update_fields:
                 update_fields.append('updated_at = CURRENT_TIMESTAMP')
-                update_values.append(user_id)
+                update_values.append(auth_token)
                 
-                query = f"UPDATE users SET {', '.join(update_fields)} WHERE user_id = %s"
+                query = f"UPDATE users SET {', '.join(update_fields)} WHERE session_token = %s"
                 cursor.execute(query, update_values)
                 conn.commit()
             
             cursor.execute(
-                "SELECT user_id, email, nickname, avatar_url, balance, created_at FROM users WHERE user_id = %s",
-                (user_id,)
+                "SELECT user_id, email, nickname, avatar_url, balance, created_at FROM users WHERE session_token = %s",
+                (auth_token,)
             )
             user = cursor.fetchone()
             cursor.close()

@@ -57,7 +57,7 @@ export default function Auth({ onAuth }: AuthProps) {
             <div className="text-6xl">🎰</div>
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Dark Casino
+            telorezov casino
           </h1>
           <p className="text-muted-foreground">
             {isLogin ? 'Войдите в свой аккаунт' : 'Создайте новый аккаунт'}
