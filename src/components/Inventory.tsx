@@ -2,6 +2,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import NFTImage from '@/components/NFTImage';
 
 interface InventoryProps {
   items: Array<{ name: string; rarity: string; emoji: string; price: number; id: string }>;
@@ -30,8 +31,9 @@ export default function Inventory({ items, onSell }: InventoryProps) {
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">Инвентарь ({items.length})</h2>
-        <div className="text-sm text-muted-foreground">
-          Всего на сумму: {items.reduce((sum, item) => sum + item.price, 0)} ₽
+        <div className="flex items-center gap-1 text-sm text-primary font-bold">
+          <span className="text-xl">⭐</span>
+          Всего на сумму: {items.reduce((sum, item) => sum + item.price, 0)}
         </div>
       </div>
 
@@ -50,11 +52,13 @@ export default function Inventory({ items, onSell }: InventoryProps) {
               </Badge>
               
               <div className="text-center py-4">
-                <div className="text-5xl mb-3">{item.emoji}</div>
+                <div className="flex justify-center mb-3">
+                  <NFTImage name={item.name} size={80} />
+                </div>
                 <p className="font-semibold text-sm mb-2">{item.name}</p>
                 <div className="flex items-center justify-center gap-1 text-primary font-bold">
-                  <Icon name="Coins" size={16} />
-                  <span>{item.price} ₽</span>
+                  <span>⭐</span>
+                  <span>{item.price}</span>
                 </div>
               </div>
 

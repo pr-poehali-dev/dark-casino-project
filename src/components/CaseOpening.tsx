@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import NFTImage from '@/components/NFTImage';
 
 interface CaseOpeningProps {
   caseData: {
@@ -145,13 +146,16 @@ export default function CaseOpening({ caseData, onComplete, onClose }: CaseOpeni
             {extendedItems.map((item, index) => (
               <Card
                 key={index}
-                className={`min-w-[200px] h-56 flex flex-col items-center justify-center gap-4 bg-gradient-to-br ${
+                className={`min-w-[200px] h-56 flex flex-col items-center justify-center gap-3 bg-gradient-to-br ${
                   rarityColors[item.rarity as keyof typeof rarityColors]
-                } p-6 shadow-2xl border-2 border-white/20`}
+                } p-4 shadow-2xl border-2 border-white/20`}
               >
-                <div className="text-7xl drop-shadow-lg">{item.emoji}</div>
-                <p className="font-bold text-white text-center text-sm leading-tight">{item.name}</p>
-                <div className="text-xs text-white/80 font-semibold">{item.price} ₽</div>
+                <NFTImage name={item.name} size={90} className="drop-shadow-2xl" />
+                <p className="font-bold text-white text-center text-xs leading-tight">{item.name}</p>
+                <div className="flex items-center gap-1 text-yellow-300 font-bold text-sm">
+                  <span>⭐</span>
+                  <span>{item.price}</span>
+                </div>
               </Card>
             ))}
           </div>
@@ -159,14 +163,16 @@ export default function CaseOpening({ caseData, onComplete, onClose }: CaseOpeni
 
         {!isSpinning && wonItem && (
           <div className="text-center space-y-6 animate-fade-in">
-            <div className="text-8xl mb-4 animate-pulse-glow drop-shadow-2xl">{wonItem.emoji}</div>
+            <div className="flex justify-center mb-4 animate-pulse-glow">
+              <NFTImage name={wonItem.name} size={150} className="drop-shadow-2xl" />
+            </div>
             <h3 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Поздравляем!
             </h3>
             <p className="text-2xl font-semibold">{wonItem.name}</p>
             <p className="text-xl text-primary font-bold flex items-center justify-center gap-2">
-              <Icon name="Coins" size={24} />
-              Стоимость: {wonItem.price} ₽
+              <span className="text-3xl">⭐</span>
+              Стоимость: {wonItem.price}
             </p>
             
             <Button
