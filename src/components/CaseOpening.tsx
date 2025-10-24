@@ -27,8 +27,22 @@ export default function CaseOpening({ caseData, onComplete, onClose }: CaseOpeni
   const winAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * caseData.items.length);
-    const selectedItem = caseData.items[randomIndex];
+    const weightedItems: Array<{ name: string; rarity: string; emoji: string; price: number }> = [];
+    
+    caseData.items.forEach(item => {
+      let weight = 1;
+      if (item.rarity === 'common') weight = 50;
+      else if (item.rarity === 'rare') weight = 25;
+      else if (item.rarity === 'epic') weight = 10;
+      else if (item.rarity === 'legendary') weight = 2;
+      
+      for (let i = 0; i < weight; i++) {
+        weightedItems.push(item);
+      }
+    });
+    
+    const randomIndex = Math.floor(Math.random() * weightedItems.length);
+    const selectedItem = weightedItems[randomIndex];
     
     const spinContext = new AudioContext();
     const spinOscillator = spinContext.createOscillator();

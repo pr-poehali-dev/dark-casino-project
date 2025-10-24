@@ -2,6 +2,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import CaseLogo from '@/components/CaseLogo';
 
 interface CaseCardProps {
   caseData: {
@@ -10,6 +11,7 @@ interface CaseCardProps {
     price: number;
     image: string;
     rarity: string;
+    logoType: 'starter' | 'premium' | 'gold';
   };
   onOpen: (caseData: any) => void;
   disabled?: boolean;
@@ -43,7 +45,9 @@ export default function CaseCard({ caseData, onOpen, disabled }: CaseCardProps) 
         </div>
 
         <div className="text-center py-8">
-          <div className="text-7xl mb-4 animate-pulse-glow">{caseData.image}</div>
+          <div className="flex justify-center mb-6">
+            <CaseLogo type={caseData.logoType} size={120} />
+          </div>
           <h3 className="text-xl font-bold mb-2">{caseData.name}</h3>
         </div>
 

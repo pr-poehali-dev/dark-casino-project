@@ -14,6 +14,7 @@ const CASES = [
     price: 50,
     image: '🎁',
     rarity: 'common',
+    logoType: 'starter' as const,
     items: [
       { name: 'NFT Кот', rarity: 'common', emoji: '🐱', price: 30 },
       { name: 'NFT Собака', rarity: 'common', emoji: '🐶', price: 35 },
@@ -27,6 +28,7 @@ const CASES = [
     price: 150,
     image: '💎',
     rarity: 'rare',
+    logoType: 'premium' as const,
     items: [
       { name: 'NFT Дракон', rarity: 'rare', emoji: '🐉', price: 200 },
       { name: 'NFT Феникс', rarity: 'rare', emoji: '🔥', price: 220 },
@@ -40,6 +42,7 @@ const CASES = [
     price: 500,
     image: '👑',
     rarity: 'epic',
+    logoType: 'gold' as const,
     items: [
       { name: 'NFT Корона', rarity: 'epic', emoji: '👑', price: 800 },
       { name: 'NFT Трофей', rarity: 'epic', emoji: '🏆', price: 850 },
