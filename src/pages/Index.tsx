@@ -15,10 +15,10 @@ const CASES = [
     image: '🎁',
     rarity: 'common',
     items: [
-      { name: 'Telegram Premium 1 месяц', rarity: 'common', emoji: '⭐' },
-      { name: 'Стикерпак', rarity: 'common', emoji: '😀' },
-      { name: 'Telegram Premium 3 месяца', rarity: 'rare', emoji: '⭐⭐' },
-      { name: 'Эмодзи-статус', rarity: 'rare', emoji: '🔥' },
+      { name: 'NFT Кот', rarity: 'common', emoji: '🐱', price: 30 },
+      { name: 'NFT Собака', rarity: 'common', emoji: '🐶', price: 35 },
+      { name: 'NFT Панда', rarity: 'rare', emoji: '🐼', price: 75 },
+      { name: 'NFT Единорог', rarity: 'rare', emoji: '🦄', price: 80 },
     ]
   },
   {
@@ -28,10 +28,10 @@ const CASES = [
     image: '💎',
     rarity: 'rare',
     items: [
-      { name: 'Telegram Premium 3 месяца', rarity: 'rare', emoji: '⭐⭐' },
-      { name: 'Звезды 100 шт', rarity: 'rare', emoji: '✨' },
-      { name: 'Telegram Premium 6 месяцев', rarity: 'epic', emoji: '⭐⭐⭐' },
-      { name: 'Коллекционный стикерпак', rarity: 'epic', emoji: '🎨' },
+      { name: 'NFT Дракон', rarity: 'rare', emoji: '🐉', price: 200 },
+      { name: 'NFT Феникс', rarity: 'rare', emoji: '🔥', price: 220 },
+      { name: 'NFT Алмаз', rarity: 'epic', emoji: '💎', price: 400 },
+      { name: 'NFT Космонавт', rarity: 'epic', emoji: '👨‍🚀', price: 450 },
     ]
   },
   {
@@ -41,10 +41,10 @@ const CASES = [
     image: '👑',
     rarity: 'epic',
     items: [
-      { name: 'Telegram Premium 6 месяцев', rarity: 'epic', emoji: '⭐⭐⭐' },
-      { name: 'Звезды 500 шт', rarity: 'epic', emoji: '✨✨' },
-      { name: 'Telegram Premium 1 год', rarity: 'legendary', emoji: '⭐⭐⭐⭐' },
-      { name: 'Уникальный юзернейм', rarity: 'legendary', emoji: '💫' },
+      { name: 'NFT Корона', rarity: 'epic', emoji: '👑', price: 800 },
+      { name: 'NFT Трофей', rarity: 'epic', emoji: '🏆', price: 850 },
+      { name: 'NFT Золотая звезда', rarity: 'legendary', emoji: '⭐', price: 1500 },
+      { name: 'NFT Ракета', rarity: 'legendary', emoji: '🚀', price: 2000 },
     ]
   },
 ];
@@ -53,7 +53,7 @@ export default function Index() {
   const [balance, setBalance] = useState(1000);
   const [activeSection, setActiveSection] = useState('cases');
   const [openingCase, setOpeningCase] = useState<typeof CASES[0] | null>(null);
-  const [inventory, setInventory] = useState<Array<{name: string, rarity: string, emoji: string}>>([]);
+  const [inventory, setInventory] = useState<Array<{name: string, rarity: string, emoji: string, price: number, id: string}>>([]);
 
   const handleOpenCase = (caseData: typeof CASES[0]) => {
     if (balance >= caseData.price) {
@@ -62,9 +62,15 @@ export default function Index() {
     }
   };
 
-  const handleCaseOpened = (wonItem: {name: string, rarity: string, emoji: string}) => {
-    setInventory([...inventory, wonItem]);
+  const handleCaseOpened = (wonItem: {name: string, rarity: string, emoji: string, price: number}) => {
+    const itemWithId = { ...wonItem, id: Date.now().toString() + Math.random() };
+    setInventory([...inventory, itemWithId]);
     setOpeningCase(null);
+  };
+
+  const handleSellItem = (itemId: string, price: number) => {
+    setInventory(inventory.filter(item => item.id !== itemId));
+    setBalance(balance + price);
   };
 
   return (
@@ -115,7 +121,7 @@ export default function Index() {
         )}
 
         {activeSection === 'inventory' && (
-          <Inventory items={inventory} />
+          <Inventory items={inventory} onSell={handleSellItem} />
         )}
 
         {activeSection === 'deposit' && (
