@@ -1,0 +1,23 @@
+{
+  "tests": [
+    {
+      "name": "Login user",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "login",
+        "email": "test@example.com",
+        "password": "password123"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "user": {
+          "email": "string"
+        },
+        "session_token": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

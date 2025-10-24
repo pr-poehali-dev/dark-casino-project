@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
@@ -6,6 +6,8 @@ import CaseCard from '@/components/CaseCard';
 import CaseOpening from '@/components/CaseOpening';
 import Inventory from '@/components/Inventory';
 import Navigation from '@/components/Navigation';
+import Auth from '@/components/Auth';
+import Profile from '@/components/Profile';
 
 const CASES = [
   {
@@ -71,10 +73,46 @@ const CASES = [
 ];
 
 export default function Index() {
+  const [user, setUser] = useState<any>(null);
+  const [sessionToken, setSessionToken] = useState<string>('');
+  const [showProfile, setShowProfile] = useState(false);
   const [balance, setBalance] = useState(1000);
   const [activeSection, setActiveSection] = useState('cases');
   const [openingCase, setOpeningCase] = useState<typeof CASES[0] | null>(null);
   const [inventory, setInventory] = useState<Array<{name: string, rarity: string, emoji: string, price: number, id: string}>>([]);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    const savedToken = localStorage.getItem('sessionToken');
+    if (savedUser && savedToken) {
+      setUser(JSON.parse(savedUser));
+      setSessionToken(savedToken);
+    }
+  }, []);
+
+  const handleAuth = (userData: any, token: string) => {
+    setUser(userData);
+    setSessionToken(token);
+    setBalance(userData.balance);
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('sessionToken', token);
+  };
+
+  const handleUpdateProfile = (updatedUser: any) => {
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setSessionToken('');
+    localStorage.removeItem('user');
+    localStorage.removeItem('sessionToken');
+  };
+
+  if (!user) {
+    return <Auth onAuth={handleAuth} />;
+  }
 
   const handleOpenCase = (caseData: typeof CASES[0]) => {
     if (balance >= caseData.price) {
@@ -105,15 +143,40 @@ export default function Index() {
             </h1>
           </div>
           
-          <Card className="px-6 py-3 bg-card border-border glow-gold">
-            <div className="flex items-center gap-3">
-              <Icon name="Wallet" size={24} className="text-primary" />
-              <div>
-                <p className="text-xs text-muted-foreground">Баланс</p>
-                <p className="text-xl font-bold text-primary">{balance} ₽</p>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setShowProfile(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+            >
+              <span className="text-2xl">{user.avatar_url || '👤'}</span>
+              <div className="text-left">
+                <p className="text-sm font-semibold">{user.nickname}</p>
+                <p className="text-xs text-muted-foreground">{user.user_id}</p>
               </div>
-            </div>
-          </Card>
+            </button>
+
+            <Card className="px-6 py-3 bg-card border-border glow-gold">
+              <div className="flex items-center gap-3">
+                <Icon name="Wallet" size={24} className="text-primary" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Баланс</p>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xl">⭐</span>
+                    <p className="text-xl font-bold text-primary">{balance}</p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              size="icon"
+              className="hover:bg-destructive/10 hover:text-destructive"
+            >
+              <Icon name="LogOut" size={20} />
+            </Button>
+          </div>
         </header>
 
         <Navigation activeSection={activeSection} onSectionChange={setActiveSection} />
@@ -229,6 +292,15 @@ export default function Index() {
           caseData={openingCase}
           onComplete={handleCaseOpened}
           onClose={() => setOpeningCase(null)}
+        />
+      )}
+
+      {showProfile && (
+        <Profile
+          user={user}
+          sessionToken={sessionToken}
+          onUpdate={handleUpdateProfile}
+          onClose={() => setShowProfile(false)}
         />
       )}
     </div>
